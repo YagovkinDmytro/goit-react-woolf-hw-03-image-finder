@@ -60,9 +60,9 @@ button {
   cursor: pointer;
 }
 
-.container {
+/* .container {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 40px 200px;
-}
+} */
