@@ -1,25 +1,33 @@
 import { Component } from 'react';
 import Searchbar from './Searchbar/Searchbar';
 import { getImageApi } from 'api/dataImages';
+import ImageGallery from './ImageGallery/ImageGallery';
+import ImageGalleryItem from './ImageGalleryItem/ImageGalleryItem';
 // import { nanoid } from 'nanoid';
 
 export class App extends Component {
-  state = { images: [] };
+  state = {
+    images: [],
+  };
 
   componentDidMount() {
-    this.getImages();
+    // this.getImages();
   }
 
-  getImages = async () => {
-    const data = await getImageApi();
+  getImages = async searchValue => {
+    const data = await getImageApi(searchValue);
+    console.log(data);
     this.setState({ images: data.hits });
   };
 
   render() {
-    console.log(this.state.images);
+    const { images } = this.state;
     return (
-      <div className="container">
-        <Searchbar></Searchbar>
+      <div className="App">
+        <Searchbar handleSubmit={this.getImages} />
+        <ImageGallery>
+          <ImageGalleryItem imagesArr={images}></ImageGalleryItem>
+        </ImageGallery>
       </div>
     );
   }
