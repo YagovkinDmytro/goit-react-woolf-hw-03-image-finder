@@ -10,31 +10,72 @@ import Loader from './Loader/Loader';
 export class App extends Component {
   state = {
     images: [],
+    page: 1,
     isLoading: false,
     error: '',
     searchValue: '',
+    loadMore: false,
   };
 
-  componentDidMount() {
-    // this.getSearchImages();
-  }
   componentDidUpdate(prevProps, prevState) {
-    if (
-      this.state.page !== prevState.page ||
-      this.state.searchValue !== prevState.searchValue
-    ) {
+    if (this.state.searchValue !== prevState.searchValue) {
       this.getSearchImages();
+    }
+    if (this.state.page !== prevState.page) {
+      this.getMoreImages();
     }
   }
 
+  // getSearchImages = async () => {
+  //   try {
+  //     this.setState({ isLoading: true, error: '' });
+  //     const data = await getImageApi(this.state.searchValue, this.state.page);
+  //     const { totalHits, hits } = data;
+  //     this.setState(prev => ({
+  //       images: [...prev.images, ...hits],
+  //       loadMore: this.state.page < Math.ceil(totalHits / 12),
+  //       isLoading: false,
+  //     }));
+  //   } catch (error) {
+  //     this.setState({ error: error.message });
+  //   } finally {
+  //     this.setState({ isLoading: false });
+  //   }
+  // };
+
   getSearchImages = async () => {
     try {
-      this.setState({ isLoading: true, error: '' });
-      const data = await getImageApi(this.state.searchValue);
+      const { searchValue, page } = this.state;
       this.setState({
-        images: data.hits,
-        isLoading: false,
+        images: [],
+        isLoading: true,
+        error: '',
+        page: 1,
       });
+      const data = await getImageApi(searchValue, page);
+      const { hits } = data;
+      this.setState(prev => ({
+        images: [...prev.images, ...hits],
+        isLoading: false,
+      }));
+    } catch (error) {
+      this.setState({ error: error.message });
+    } finally {
+      this.setState({ isLoading: false, loadMore: true });
+    }
+  };
+
+  getMoreImages = async () => {
+    try {
+      const { searchValue, page } = this.state;
+      this.setState({ isLoading: true, error: '' });
+      const data = await getImageApi(searchValue, page);
+      const { totalHits, hits } = data;
+      this.setState(prev => ({
+        images: [...prev.images, ...hits],
+        loadMore: this.state.page < Math.ceil(totalHits / 12),
+        isLoading: false,
+      }));
     } catch (error) {
       this.setState({ error: error.message });
     } finally {
@@ -46,9 +87,14 @@ export class App extends Component {
     this.setState({ searchValue });
   };
 
-  render() {
-    const { images, isLoading, error, searchValue } = this.state;
+  addPage = () => {
+    this.setState(prev => ({ page: prev.page + 1 }));
+  };
 
+  render() {
+    const { images, isLoading, error, searchValue, loadMore, page } =
+      this.state;
+    console.log(page);
     return (
       <div className="App">
         {isLoading && <Loader></Loader>}
@@ -59,7 +105,7 @@ export class App extends Component {
             <ImageGalleryItem imagesArr={images}></ImageGalleryItem>
           </ImageGallery>
         )}
-        <Button></Button>
+        {loadMore && <Button addPage={this.addPage}></Button>}
       </div>
     );
   }

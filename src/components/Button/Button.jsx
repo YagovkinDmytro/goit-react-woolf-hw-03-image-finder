@@ -1,8 +1,8 @@
-const Button = () => {
+const Button = ({ addPage }) => {
   return (
-    <div>
-      <button className="Button">Load more</button>
-    </div>
+    <button type="submit" className="Button" onClick={() => addPage()}>
+      Load more
+    </button>
   );
 };
 
