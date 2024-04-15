@@ -5,7 +5,7 @@ import ImageGallery from './ImageGallery/ImageGallery';
 import ImageGalleryItem from './ImageGalleryItem/ImageGalleryItem';
 import Button from './Button/Button';
 import Loader from './Loader/Loader';
-// import { nanoid } from 'nanoid';
+import Modal from './Modal/Modal';
 
 export class App extends Component {
   state = {
@@ -16,7 +16,13 @@ export class App extends Component {
     searchValue: '',
     loadMore: false,
     isEmpty: false,
+    openModal: false,
+    largeImageURL: '',
   };
+
+  componentDidMount() {
+    document.addEventListener('keydown', this.handleEsc);
+  }
 
   componentDidUpdate(_, prevState) {
     if (
@@ -25,6 +31,10 @@ export class App extends Component {
     ) {
       this.getSearchImages();
     }
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleEsc);
   }
 
   getSearchImages = async () => {
@@ -69,18 +79,61 @@ export class App extends Component {
     this.setState(prev => ({ page: prev.page + 1 }));
   };
 
+  handleSetOpenModal = (largeImageURL, tags) => {
+    this.setState({
+      largeImageURL,
+      tags,
+      openModal: true,
+    });
+  };
+
+  handleSetCloseModal = () => {
+    this.setState({
+      openModal: false,
+    });
+  };
+
+  handleEsc = ({ code }) => {
+    console.log('click');
+    if (code === 'Escape') {
+      this.setState({
+        openModal: false,
+      });
+    }
+  };
+
   render() {
-    const { images, isLoading, error, loadMore, isEmpty } = this.state;
+    const {
+      images,
+      isLoading,
+      error,
+      loadMore,
+      isEmpty,
+      openModal,
+      largeImageURL,
+      tags,
+    } = this.state;
+
     return (
       <div className="App">
         {isLoading && <Loader></Loader>}
         <Searchbar searchParam={this.searchParam} />
         <ImageGallery>
-          <ImageGalleryItem imagesArr={images}></ImageGalleryItem>
+          <ImageGalleryItem
+            imagesArr={images}
+            handleSetOpenModal={this.handleSetOpenModal}
+          ></ImageGalleryItem>
         </ImageGallery>
         {error && <h1>{error}</h1>}
         {isEmpty && <h1>Sorry. There are no inages.😥</h1>}
         {loadMore && <Button handleAddPage={this.handleAddPage}></Button>}
+        {openModal && (
+          <Modal
+            largeImageURL={largeImageURL}
+            tags={tags}
+            handleSetCloseModal={this.handleSetCloseModal}
+          ></Modal>
+        )}
       </div>
     );
   }
