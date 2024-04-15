@@ -15,66 +15,36 @@ export class App extends Component {
     error: '',
     searchValue: '',
     loadMore: false,
+    isEmpty: false,
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.searchValue !== prevState.searchValue) {
+  componentDidUpdate(_, prevState) {
+    if (
+      this.state.searchValue !== prevState.searchValue ||
+      this.state.page !== prevState.page
+    ) {
       this.getSearchImages();
-    }
-    if (this.state.page !== prevState.page) {
-      this.getMoreImages();
     }
   }
 
-  // getSearchImages = async () => {
-  //   try {
-  //     this.setState({ isLoading: true, error: '' });
-  //     const data = await getImageApi(this.state.searchValue, this.state.page);
-  //     const { totalHits, hits } = data;
-  //     this.setState(prev => ({
-  //       images: [...prev.images, ...hits],
-  //       loadMore: this.state.page < Math.ceil(totalHits / 12),
-  //       isLoading: false,
-  //     }));
-  //   } catch (error) {
-  //     this.setState({ error: error.message });
-  //   } finally {
-  //     this.setState({ isLoading: false });
-  //   }
-  // };
-
   getSearchImages = async () => {
     try {
-      const { searchValue, page } = this.state;
-      this.setState({
-        images: [],
-        isLoading: true,
-        error: '',
-        page: 1,
-      });
-      const data = await getImageApi(searchValue, page);
-      const { hits } = data;
-      this.setState(prev => ({
-        images: [...prev.images, ...hits],
-        isLoading: false,
-      }));
-    } catch (error) {
-      this.setState({ error: error.message });
-    } finally {
-      this.setState({ isLoading: false, loadMore: true });
-    }
-  };
-
-  getMoreImages = async () => {
-    try {
-      const { searchValue, page } = this.state;
       this.setState({ isLoading: true, error: '' });
-      const data = await getImageApi(searchValue, page);
+      const data = await getImageApi(this.state.searchValue, this.state.page);
       const { totalHits, hits } = data;
+      console.log(hits);
+      if (hits.length === 0) {
+        this.setState({
+          isEmpty: true,
+          loadMore: false,
+        });
+        return;
+      }
       this.setState(prev => ({
         images: [...prev.images, ...hits],
         loadMore: this.state.page < Math.ceil(totalHits / 12),
         isLoading: false,
+        isEmpty: false,
       }));
     } catch (error) {
       this.setState({ error: error.message });
@@ -84,28 +54,33 @@ export class App extends Component {
   };
 
   searchParam = searchValue => {
-    this.setState({ searchValue });
+    if (searchValue === '') {
+      alert('Please type a new word');
+      return;
+    }
+    if (searchValue === this.state.searchValue) {
+      alert('We have already shown thoes photos');
+      return;
+    }
+    this.setState({ searchValue, images: [], page: 1 });
   };
 
-  addPage = () => {
+  handleAddPage = () => {
     this.setState(prev => ({ page: prev.page + 1 }));
   };
 
   render() {
-    const { images, isLoading, error, searchValue, loadMore, page } =
-      this.state;
-    console.log(page);
+    const { images, isLoading, error, loadMore, isEmpty } = this.state;
     return (
       <div className="App">
         {isLoading && <Loader></Loader>}
-        {error && <h1>{error}</h1>}
         <Searchbar searchParam={this.searchParam} />
-        {searchValue && (
-          <ImageGallery>
-            <ImageGalleryItem imagesArr={images}></ImageGalleryItem>
-          </ImageGallery>
-        )}
-        {loadMore && <Button addPage={this.addPage}></Button>}
+        <ImageGallery>
+          <ImageGalleryItem imagesArr={images}></ImageGalleryItem>
+        </ImageGallery>
+        {error && <h1>{error}</h1>}
+        {isEmpty && <h1>Sorry. There are no inages.😥</h1>}
+        {loadMore && <Button handleAddPage={this.handleAddPage}></Button>}
       </div>
     );
   }

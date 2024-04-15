@@ -1,6 +1,6 @@
-const Button = ({ addPage }) => {
+const Button = ({ handleAddPage }) => {
   return (
-    <button type="submit" className="Button" onClick={() => addPage()}>
+    <button type="submit" className="Button" onClick={() => handleAddPage()}>
       Load more
     </button>
   );
