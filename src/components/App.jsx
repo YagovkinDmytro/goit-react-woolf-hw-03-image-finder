@@ -20,10 +20,6 @@ export class App extends Component {
     largeImageURL: '',
   };
 
-  componentDidMount() {
-    document.addEventListener('keydown', this.handleEsc);
-  }
-
   componentDidUpdate(_, prevState) {
     if (
       this.state.searchValue !== prevState.searchValue ||
@@ -31,10 +27,6 @@ export class App extends Component {
     ) {
       this.getSearchImages();
     }
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.handleEsc);
   }
 
   getSearchImages = async () => {
@@ -91,15 +83,6 @@ export class App extends Component {
     this.setState({
       openModal: false,
     });
-  };
-
-  handleEsc = ({ code }) => {
-    console.log('click Escape');
-    if (code === 'Escape') {
-      this.setState({
-        openModal: false,
-      });
-    }
   };
 
   render() {

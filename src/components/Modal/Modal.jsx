@@ -1,16 +1,35 @@
-const Modal = ({ largeImageURL, tags, handleSetCloseModal }) => {
-  const handleClick = evt => {
+import { Component } from 'react';
+
+class Modal extends Component {
+  componentDidMount() {
+    document.addEventListener('keydown', this.handleEsc);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleEsc);
+  }
+
+  handleClick = evt => {
     if (evt.target.className === 'Overlay') {
-      handleSetCloseModal();
+      this.props.handleSetCloseModal();
     }
   };
-  return (
-    <div className="Overlay" onClick={handleClick}>
-      <div className="Modal">
-        <img src={largeImageURL} alt={tags} />
+
+  handleEsc = ({ code }) => {
+    console.log('click ');
+    if (code === 'Escape') {
+      this.props.handleSetCloseModal();
+    }
+  };
+  render() {
+    return (
+      <div className="Overlay" onClick={this.handleClick}>
+        <div className="Modal">
+          <img src={this.props.largeImageURL} alt={this.props.tags} />
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+}
 
 export default Modal;
