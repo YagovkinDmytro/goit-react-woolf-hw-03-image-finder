@@ -1,7 +1,5 @@
 const ImageGalleryItem = ({ imagesArr, handleSetOpenModal }) => {
   const handleClick = (largeImageURL, tags) => {
-    console.log(largeImageURL);
-    console.log(tags);
     handleSetOpenModal(largeImageURL, tags);
   };
   return imagesArr.map(({ id, webformatURL, largeImageURL, tags }) => (

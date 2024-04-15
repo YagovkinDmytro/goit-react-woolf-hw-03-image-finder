@@ -16,7 +16,6 @@ class Modal extends Component {
   };
 
   handleEsc = ({ code }) => {
-    console.log('click ');
     if (code === 'Escape') {
       this.props.handleSetCloseModal();
     }

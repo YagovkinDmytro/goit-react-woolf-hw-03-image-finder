@@ -34,7 +34,6 @@ export class App extends Component {
       this.setState({ isLoading: true, error: '' });
       const data = await getImageApi(this.state.searchValue, this.state.page);
       const { totalHits, hits } = data;
-      console.log(hits);
       if (hits.length === 0) {
         this.setState({
           isEmpty: true,
