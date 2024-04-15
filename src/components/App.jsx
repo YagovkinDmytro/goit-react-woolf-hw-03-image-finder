@@ -94,7 +94,7 @@ export class App extends Component {
   };
 
   handleEsc = ({ code }) => {
-    console.log('click');
+    console.log('click Escape');
     if (code === 'Escape') {
       this.setState({
         openModal: false,
